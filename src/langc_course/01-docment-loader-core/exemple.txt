@@ -1,0 +1,75 @@
+# for the core  document loader
+# PyPDFLoader  for PDF files  .pdf
+# TextLoader    plan text files  .txt
+# DirectoryLoader  for directory of files  .txt, .pdf, .docx, .csv, .json, .html
+# WebBaseLoader  for web pages  .html
+# UnstructuredDataLoader  for unstructured data  .txt, .pdf, .docx, .csv, .json, .html
+#loader=Loader("path/to/file.pdf")  # Replace with the actual path to your PDF file
+
+
+
+
+PDF Loading Options
+1:
+
+PyPDFLoader ====> fast,basic extraction 
+
+speed    GOOOD
+Metadata basic
+ths for simple pdfs
+
+
+2: 
+PyPDFLoader
+fastr,good Metadata
+
+speeed Bst
+Metadat Rich 
+
+
+
+
+3: 
+UnstructurePDFLoader
+
+best for complex layets 
+speed Slower
+metadata Detaild 
+tables & layouts 
+
+
+
+===> Start with PyPDFLoadder , fwitch only if you need more
+
+
+
+
+Web Loading 
+single URL
+   https://example.com ==> WebBaseLoader ==> Document
+
+
+
+
+multiple URLs
+   https://example.com1                       Document1
+   https://example.com2 ==> WebBaseLoader ==> Document2
+   https://example.com3                       Document3
+
+
+
+
+Directory Loading 
+
+docs/                             DirectoryLoader
+    report.pdf
+    notes.txt 
+    data.csv                       .path    "docs/"
+    guide.pdf              ====>    glob     "**/*pdf"
+    readme.txt                      loader_ci PyPDFLoader
+    summary.pdf
+
+
+
+
+==>  glob pattern filtrs files "**/*.pdf = all PDFs in all subdirectories . 
