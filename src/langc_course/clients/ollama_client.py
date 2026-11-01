@@ -1,6 +1,8 @@
 
 import os
+from urllib import response
 import requests
+import ollama
 
 from typing import Optional
 
@@ -92,39 +94,13 @@ class OllamaCloudClient:
 
     # Embedding methods this in 03-embedding/raw_emb.py 
 
+
     def embed(self, texts: list[str]) -> list[list[float]]:
 
-        url = f"{self.BASE_URL}/embeddings"
+        response = ollama.embed(
+                model=self.embedding_model,
+                input=texts
+            )
 
-        payload = {
-            "model": self.embedding_model,
-            "input": texts
-        }
-
-        response = requests.post(
-            url,
-            headers=self.headers,
-            json=payload,
-            timeout=120
-        )
-
-        response.raise_for_status()
-
-        result = response.json()
-
-        # Extract vectors from the API response
-        return [
-            item["embedding"]
-            for item in result["data"]
-        ]
-
-    def embed_query(self, text: str) -> list[float]:
-
-        embeddings = self.embed([text])
-
-        return embeddings[0]
-
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
-
-        return self.embed(texts)
+        return response.embeddings
 

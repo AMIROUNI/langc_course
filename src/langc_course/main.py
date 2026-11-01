@@ -16,6 +16,7 @@ print(f"langgraph version: {version('langgraph')}")
 def main():
 
     llm = OllamaCloudClient(
+        embedding_model="embeddinggemma",
         model="gemma4:31b",
         temperature=0
     )

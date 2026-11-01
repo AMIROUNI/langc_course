@@ -9,7 +9,7 @@ load_dotenv()  # Load environment variables from .env file
 
 client   = OllamaCloudClient(
     model="gemma4:31b",
-    embedding_model="embeddinggemma",
+    embedding_model="embeddinggemma-2:latest",
     temperature=0
 )
 
@@ -33,4 +33,5 @@ texts = [
 ]
 
 vectors = client.embed(texts)
-print(vectors)
+print("Number of embeddings:", len(vectors))
+print("Embedding dimensions:", len(vectors[0]))
