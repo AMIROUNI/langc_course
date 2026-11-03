@@ -1,106 +1,148 @@
 
 import os
-from urllib import response
 import requests
 import ollama
 
-from typing import Optional
+from typing import Optional, Any,ClassVar
+
+from pydantic import Field, PrivateAttr
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+)
+from langchain_core.outputs import ChatGeneration, ChatResult
 
 
-class OllamaCloudClient:
+class OllamaCloudClient(BaseChatModel):
 
-    BASE_URL = "https://ollama.com/v1"
+    model: str
+    embedding_model: str
+    temperature: float = 0
+
+    api_key: Optional[str] = Field(default=None, exclude=True)
+
+    _headers: dict = PrivateAttr()
+    _embedding_client: Any = PrivateAttr()
+
+    BASE_URL : ClassVar[str] =  "https://ollama.com/v1"
 
     def __init__(
         self,
         model: str,
         embedding_model: str,
         api_key: Optional[str] = None,
-        temperature: float = 0
+        temperature: float = 0,
+        **kwargs
     ):
-        self.api_key = api_key or os.getenv("OLLAMA_API_KEY")
+
+        super().__init__(
+            model=model,
+            embedding_model=embedding_model,
+            temperature=temperature,
+            api_key=api_key or os.getenv("OLLAMA_API_KEY"),
+            **kwargs
+        )
 
         if not self.api_key:
             raise ValueError("OLLAMA_API_KEY is missing")
 
-        self.model = model
-        self.temperature = temperature
-        self.embedding_model = embedding_model
-
-        self.headers = {
+        self._headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
 
-        # OpenAI-style interface
-        self.chat = self.Chat(self)
-
-    class Chat:
-
-        def __init__(self, client):
-            self.completions = client.Completions(client)
-
-    class Completions:
-
-        def __init__(self, client):
-            self.client = client
-
-        def create(
-            self,
-            model: Optional[str] = None,
-            messages: Optional[list] = None,
-            temperature: Optional[float] = None,
-            stream: bool = False
-        ):
-
-            if not messages:
-                raise ValueError("messages cannot be empty")
-
-            url = f"{self.client.BASE_URL}/chat/completions"
-
-            payload = {
-                "model": model or self.client.model,
-                "messages": messages,
-                "temperature": (
-                    temperature
-                    if temperature is not None
-                    else self.client.temperature
-                ),
-                "stream": stream
-            }
-
-            response = requests.post(
-                url,
-                headers=self.client.headers,
-                json=payload,
-                timeout=120
-            )
-
-            response.raise_for_status()
-
-            return response.json()
-
-    # Simple convenience method
-    def invoke(self, prompt: str) -> str:
-
-        response = self.chat.completions.create(
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        self._embedding_client = ollama.Client(
+            host="http://localhost:11434"
         )
 
-        return response["choices"][0]["message"]["content"]
+    # --------------------------------
+    # LANGCHAIN CHAT MODEL
+    # --------------------------------
+# @property makes the method behave like a read-only attribute.
+    @property
+    def _llm_type(self) -> str:
+        return "ollama-cloud"
 
+    @property
+    def _identifying_params(self) -> dict:
+        return {
+            "model": self.model,
+            "temperature": self.temperature
+        }
 
-    # Embedding methods this in 03-embedding/raw_emb.py 
+    def _generate(
+        self,
+        messages: list[BaseMessage],
+        stop: Optional[list[str]] = None,
+        run_manager=None,
+        **kwargs
+    ) -> ChatResult:
 
+        formatted_messages = []
+
+        for message in messages:
+
+            if isinstance(message, HumanMessage):
+                role = "user"
+
+            elif isinstance(message, SystemMessage):
+                role = "system"
+
+            elif isinstance(message, AIMessage):
+                role = "assistant"
+
+            else:
+                raise ValueError(
+                    f"Unsupported message type: {type(message)}"
+                )
+
+            formatted_messages.append({
+                "role": role,
+                "content": message.content
+            })
+
+        payload = {
+            "model": self.model,
+            "messages": formatted_messages,
+            "temperature": self.temperature,
+            "stream": False
+        }
+
+        if stop:
+            payload["stop"] = stop
+
+        response = requests.post(
+            f"{self.BASE_URL}/chat/completions",
+            headers=self._headers,
+            json=payload,
+            timeout=120
+        )
+
+        response.raise_for_status()
+
+        content = response.json()["choices"][0]["message"]["content"]
+
+        generation = ChatGeneration(
+            message=AIMessage(content=content)
+        )
+
+        return ChatResult(generations=[generation])
+
+    # --------------------------------
+    # LOCAL EMBEDDINGS
+    # --------------------------------
 
     def embed(self, texts: list[str]) -> list[list[float]]:
 
-        response = ollama.embed(
-                model=self.embedding_model,
-                input=texts
-            )
+        if not texts:
+            return []
+
+        response = self._embedding_client.embed(
+            model=self.embedding_model,
+            input=texts
+        )
 
         return response.embeddings
-
