@@ -20,7 +20,16 @@ own `README.md` with a simple explanation and the exact command to run.
 After the main path, read:
 
 - [The 5 RAG failure modes](src/langc_course/the_5_rag_failure_modes/README.md) -
-  what goes wrong in RAG and how to recognise it.
+  what goes wrong in RAG and how to recognise it, with runnable examples in
+  [bad_chunking](src/langc_course/the_5_rag_failure_modes/bad_chunking/README.md),
+  [embedding_mismatch](src/langc_course/the_5_rag_failure_modes/embedding_mismatch/README.md),
+  and [hybrid_search](src/langc_course/the_5_rag_failure_modes/hybrid_search/README.md).
+- [Token budgeting](src/langc_course/token_budgeting/README.md) - keep requests
+  inside a token budget and track usage.
+- [LangSmith observability](src/langc_course/langsmith/README.md) - trace chains
+  and inspect them in the LangSmith dashboard.
+- [Clean Chroma](src/langc_course/clean_chroma/README.md) - remove duplicate
+  documents from a Chroma collection.
 - [Clients](src/langc_course/clients/README.md) - the shared Ollama client used by
   the examples (reference, not a lesson step).
 
@@ -91,6 +100,14 @@ OLLAMA_API_KEY=your_key_here
 `.env` is gitignored - never commit real keys. See `.env.exemple` for the
 expected variable.
 
+For the LangSmith lesson, also add:
+
+```dotenv
+LANGSMITH_API_KEY=your_key_here
+LANGSMITH_PROJECT=langc-course
+LANGSMITH_TRACING=true
+```
+
 ## Project structure
 
 ```text
@@ -106,6 +123,12 @@ src/langc_course/
 ├── metadata_filtering/        # Step 5: filter search results with metadata
 ├── build_a_basic_rag_system/  # Step 6: complete RAG pipeline
 ├── the_5_rag_failure_modes/   # Reference: what goes wrong in RAG
+│   ├── bad_chunking/          # Failure mode 1: chunking and overlap demo
+│   ├── embedding_mismatch/    # Failure mode 2: embedding similarity demo
+│   └── hybrid_search/         # Failure mode 3: BM25 + vector hybrid search
+├── token_budgeting/           # Reference: token budgets and usage stats
+├── langsmith/                 # Reference: tracing and observability
+├── clean_chroma/              # Utility: remove duplicate documents
 ├── clients/                   # Shared Ollama client code
 ├── check_models.py
 └── main.py
@@ -120,6 +143,9 @@ uv run python src/langc_course/01-docment-loader-core/exempleTextLoader.py
 uv run python src/langc_course/03-embedding/raw_emb.py
 uv run python src/langc_course/vector_db_using_chroma/vector_stores.py
 uv run python src/langc_course/build_a_basic_rag_system/rag_pipeline.py
+uv run python src/langc_course/the_5_rag_failure_modes/hybrid_search/hybrid_retriever.py
+uv run python src/langc_course/token_budgeting/cost_optimization.py
+uv run python src/langc_course/langsmith/langsmith_setup.py
 ```
 
 The PDF example uses the relative path `./pdf/Lettre_motivation_.pdf`, so run it
@@ -135,5 +161,7 @@ uv run python exemple_pdf_laoder.py
 - `exemple.md` in `01-docment-loader-core` summarizes the core document loaders
   and when to use each PDF loader.
 - The chunking folder contains diagrams only; the runnable splitter demo is in
-  `the_5_rag_failure_modes/bad_chunking/text_splitters.py`.
+  `the_5_rag_failure_modes/bad_chunking/text_splitters.py` (see its README).
+- `clean_chroma/clean_chroma.py` removes duplicates from the `hybrid` collection
+  created by `the_5_rag_failure_modes/hybrid_search/prod_hybrid_serach.py`.
 - Generated folders such as `chroma_db/` are not committed.

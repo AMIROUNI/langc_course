@@ -16,7 +16,7 @@ from langchain_core.messages import (
 from langchain_core.outputs import ChatGeneration, ChatResult
 
 
-class OllamaCloudClient(BaseChatModel):
+class OllamaCloudClient(BaseChatModel):    
 
     model: str
     embedding_model: str

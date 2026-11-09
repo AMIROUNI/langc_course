@@ -153,7 +153,66 @@ def recursive_splitter():
 
 
 
+def overlap_importance():
+    """
+    Demonstrates the importance of chunk overlap in text splitting.
+    """
+    # Split without overlap
+    splitter_no_overlap = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=0,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    chunks_no_overlap = splitter_no_overlap.split_text(SAMPLE_TEXT)
+
+    # Split with overlap
+    splitter_with_overlap = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    chunks_with_overlap = splitter_with_overlap.split_text(SAMPLE_TEXT)
+    print(f"======== Overlap Importance Demonstration ========")
+    print(f"======== first ========")
+    print(f"we start without overlap")
+    print(f"Number of chunks without overlap: {len(chunks_no_overlap)}")
+    print(f"first chunk without overlap starts with: {chunks_no_overlap[1]}...")
+    print(f"Without overlap: {[len(chunk) for chunk in chunks_no_overlap]}")
+    print(f"======== second ========")
+    print(f"we start with overlap")
+    print(f"Number of chunks with overlap: {len(chunks_with_overlap)}")
+    print(f"With overlap: {[len(chunk) for chunk in chunks_with_overlap]}")
+    print(f"first chunk with overlap starts with: {chunks_with_overlap[1]}...")
+
+
 
 if __name__ == "__main__":
-    print("=== Recursive Character Text Splitter ===")
-    recursive_splitter()
+   # print("=== Recursive Character Text Splitter ===")
+  #  recursive_splitter()
+    overlap_importance()
+
+
+
+
+#===========================================================================
+# see this explain the effect of chunk overlap on RAG performance.
+#===========================================================================
+
+# Without overlap this might split as :
+
+# Chunk 1 : "The API Key expries after 24 hours."
+# Chunk 2: "You must refresh it using the token endpoint ."
+
+
+
+# User asked a question: "How do I handle API key expiration?"
+
+# chunk 1 match the "expiration " but misses the solutioin .
+# chk2 has the solution but misses the context of expiration.
+
+#With overlap , Chunk 2 would include "expires after 24 hours" and "refresh it using the token endpoint" so the model can answer the question correctly.
+
+
+
+# this means the overlap is important to ensure that the context is preserved across chunks, allowing the model to retrieve relevant information for answering questions accurately.
+# so findinig the right balance between chunk size and overlap is crucial for optimizing RAG performance.

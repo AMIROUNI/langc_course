@@ -1,38 +1,39 @@
 # The 5 RAG Failure Modes
 
 **Simple idea:** RAG can fail in a small number of common ways. This folder is a
-reference gallery for recognising them.
+reference gallery for recognising them, with runnable examples where they exist.
 
-| # | Failure mode | What it means in simple words |
-| --- | --- | --- |
-| 1 | Bad chunking | A chunk is cut in the middle of a sentence, so its meaning is lost. |
-| 2 | Embedding mismatch | The question and the documents are embedded in a way that does not match, so they look unrelated. |
-| 3 | Retrieval noise | The search returns irrelevant chunks along with the useful ones. |
-| 4 | Context overflow | Too much text is sent to the model and it exceeds the context window. |
-| 5 | Hallucination | The model invents facts that are not in the retrieved context. |
+| # | Failure mode | What it means in simple words | Example |
+| --- | --- | --- | --- |
+| 1 | Bad chunking | A chunk is cut in the middle of a sentence, so its meaning is lost. | [bad_chunking](bad_chunking/README.md) |
+| 2 | Embedding mismatch | The question and the documents are embedded in a way that does not match, so they look unrelated. | [embedding_mismatch](embedding_mismatch/README.md) |
+| 3 | Retrieval noise | The search returns irrelevant chunks along with the useful ones. | [hybrid_search](hybrid_search/README.md) |
+| 4 | Context overflow | Too much text is sent to the model and it exceeds the context window. | [token_budgeting](../token_budgeting/README.md) |
+| 5 | Hallucination | The model invents facts that are not in the retrieved context. | [build_a_basic_rag_system](../build_a_basic_rag_system/README.md) |
 
-See the two images in this folder:
+## Images in this folder
 
-- `the_5_rag_fail.png` - all five failure modes on one page.
-- `1Bad_chunking.png` - a clear before/after example of bad chunking.
+| Image | Shows |
+| --- | --- |
+| `the_5_rag_fail.png` | All five failure modes on one page. |
+| `1Bad_chunking.png` | A clear before/after example of bad chunking. |
+| `2when_vector_seearch_fails.png` | When vector search misses exact words. |
+| `3vector_vs_BM25.png` | Vector search compared with BM25 keyword search. |
+| `4_hybrid_search_pipeline$.png` | The hybrid search pipeline. |
+| `5_when_to_use_hybrid_search.png` | When hybrid search is worth it. |
+| `6_tunig_the_weights.png` | How to tune the BM25 and vector weights. |
 
-## The runnable example
+## Runnable examples
 
-`bad_chunking/text_splitters.py` contains a long text about machine learning and
-shows how `RecursiveCharacterTextSplitter` cuts it into chunks.
-
-Run it from the repository root:
+From the repository root:
 
 ```powershell
 uv run python src/langc_course/the_5_rag_failure_modes/bad_chunking/text_splitters.py
+uv run python src/langc_course/the_5_rag_failure_modes/embedding_mismatch/embeddings_deep.py
+uv run python src/langc_course/the_5_rag_failure_modes/hybrid_search/hybrid_retriever.py
 ```
 
-The output shows:
-
-- the original text length,
-- how many chunks were created,
-- the size of each chunk,
-- the beginning of the first chunk.
+Each subfolder has its own `README.md` with the details and expected output.
 
 ## How to use this folder
 
