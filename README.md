@@ -30,6 +30,8 @@ After the main path, read:
   and inspect them in the LangSmith dashboard.
 - [Clean Chroma](src/langc_course/clean_chroma/README.md) - remove duplicate
   documents from a Chroma collection.
+- [RAG optimization](src/langc_course/rag_optimization/README.md) - semantic
+  chunking, contextual compression, and parent-document retrieval.
 - [Clients](src/langc_course/clients/README.md) - the shared Ollama client used by
   the examples (reference, not a lesson step).
 
@@ -129,6 +131,7 @@ src/langc_course/
 ├── token_budgeting/           # Reference: token budgets and usage stats
 ├── langsmith/                 # Reference: tracing and observability
 ├── clean_chroma/              # Utility: remove duplicate documents
+├── rag_optimization/          # Reference: semantic chunking, compression, parents
 ├── clients/                   # Shared Ollama client code
 ├── check_models.py
 └── main.py
@@ -146,6 +149,9 @@ uv run python src/langc_course/build_a_basic_rag_system/rag_pipeline.py
 uv run python src/langc_course/the_5_rag_failure_modes/hybrid_search/hybrid_retriever.py
 uv run python src/langc_course/token_budgeting/cost_optimization.py
 uv run python src/langc_course/langsmith/langsmith_setup.py
+uv run python src/langc_course/rag_optimization/semantic_chunking.py
+uv run python src/langc_course/rag_optimization/contextual_compression.py
+uv run python src/langc_course/rag_optimization/parent_document_retriever.py
 ```
 
 The PDF example uses the relative path `./pdf/Lettre_motivation_.pdf`, so run it
